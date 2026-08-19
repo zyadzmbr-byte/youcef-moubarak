@@ -1,0 +1,78 @@
+274: <div onclick="showSection('tab-codes', this)"
+339: <div id="tab-codes" class="admin-section">
+340: <h2>إضافة وتوليد أكواد الطلاب</h2>
+342: <button type="button" class="btn-primary w-100" onclick="window.generateStudentCode(event)" style="font-size:18px; padding:15px;">توليد كود عشوائي</button>
+347: <select id="code-filter" onchange="window.renderTables()" style="padding:10px; border-radius:10px; border:1px solid #ccc; width:auto;">
+354: <table id="table-codes"></table>
+375: <input type="text" id="ev-code" required>
+404: <select id="ct-status" onchange="document.getElementById('subcode-container').style.display = this.value === 'paid' ? 'block' : 'none';">
+409: <div class="form-group" id="subcode-container" style="display:none;">
+411: <input type="text" id="ct-subcode" placeholder="أدخل الكود السري الذي يفتح المحتوى">
+513: <input type="text" id="ex-student-code" placeholder="أدخل كود الطالب أو اتركه فارغاً للجميع">
+566: <input type="text" id="lnk-student-code" placeholder="أدخل كود الطالب أو اتركه فارغاً للجميع">
+610: <input type="text" id="cc-code" required placeholder="أدخل كود الطالب هنا">
+649: <input type="text" id="re-code" required placeholder="أدخل كود الطالب هنا">
+702: <input type="text" id="chat-code" required placeholder="أدخل كود الطالب">
+729: <input type="text" id="mr-code" required placeholder="أدخل كود الطالب">
+858: let code = document.getElementById('ev-code').value;
+860: let newUserEval = { code, note, date: new Date().toLocaleDateString('ar-EG') };
+895: let codesList = [];
+896: if (window.fsData && window.fsData.getAllCodes) {
+897: try { codesList = await window.fsData.getAllCodes(); localStorage.setItem('spedia_codes', JSON.stringify(codesList)); } catch (e) { }
+899: codesList = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+902: let codeFilter = document.getElementById('code-filter') ? document.getElementById('code-filter').value : 'all';
+903: if (codeFilter === 'used') codesList = codesList.filter(c => c.used || c.isUsed);
+904: else if (codeFilter === 'available') codesList = codesList.filter(c => !(c.used || c.isUsed));
+906: const tCodes = document.getElementById('table-codes');
+907: if (tCodes) {
+910: tCodes.innerHTML = `<tr>${ths}</tr>` + codesList.map(c => {
+913: let tr = `<td>${c.code}</td><td>${c.date || ''}</td><td>${statusLabel}</td>`;
+914: if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('codes', '${c.fsId || c.code}', 'spedia_codes', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+940: let tr = `<td>${u.code}</td><td>${u.name}</td><td>${adminType === 'restricted' ? '********' : u.phone}</td><td>${u.grade}</td>`;
+941: if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('users', '${u.fsId || u.code}', 'spedia_users', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+951: let tr = `<td>${a.code}</td><td>${a.name}</td><td>${a.date}</td><td>${a.time}</td>`;
+952: if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('attendance', '${a.fsId || a.code}', 'spedia_attendance', 'code')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+962: let tr = `<td>${s.name || s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td>`;
+963: if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('submissions', '${s.fsId || s.id || s.code}', 'spedia_submissions', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+1000: let targetText = l.studentCode ? `كود: ${l.studentCode}` : 'الكل';
+1014: let tr = `<td>${f.studentName || f.studentCode}</td><td>${f.grade}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:var(--primary-color);">معاينة</a></td>`;
+1015: if (adminType === 'full') tr += `<td><button onclick="window.deleteItemGeneric('student_files', '${f.fsId || f.id || f.studentCode}', 'spedia_student_files', 'id')" style="background:#f44336; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">حذف</button></td>`;
+1031: let targetText = ex.studentCode ? `كود: ${ex.studentCode}` : 'الكل';
+1051: let tr = `<td>${c.studentCode}</td><td>${c.type}</td><td>${c.title}</td><td>${c.date}</td>`;
+1061: sFiles.map(f => `<tr><td>${f.studentCode}</td><td>${f.title}</td><td>${f.date}</td><td><a href="${f.url}" target="_blank" style="color:#12b8c5;">فتح الملف</a></td></tr>`).join('');
+1066: subs.map(s => `<tr><td>${s.code}</td><td>${s.examTitle}</td><td>${s.status}</td><td><button onclick="window.openGrading('${s.code}', '${s.examTitle}')" style="padding:5px 10px; background:var(--primary-color); border:none; color:#fff; border-radius:5px; cursor:pointer;">فتح</button></td></tr>`).join('');
+1079: return `<tr><td>${c.studentCode}</td><td>${senderLabel}</td><td>${c.message}</td><td>${c.date}</td></tr>`;
+1134: studentCode: document.getElementById('lnk-student-code') ? document.getElementById('lnk-student-code').value.trim() : ''
+1185: let code = document.getElementById('cc-code').value;
+1198: studentCode: code,
+1227: let code = document.getElementById('re-code').value;
+1240: studentCode: code,
+1258: document.getElementById('re-code').value = '';
+1377: window.generateStudentCode = async function(e) {
+1380: if (btn && btn.tagName === 'BUTTON') btn.innerText = "جاري التوليد...";
+1382: let codesList = JSON.parse(localStorage.getItem('spedia_codes') || '[]');
+1385: // Ensure unique code
+1388: } while (codesList.find(x => x.code === c));
+1390: let codeObj = { code: c, date: new Date().toLocaleDateString('ar-EG'), isUsed: false };
+1392: if (window.fsData && window.fsData.addCode) {
+1394: await window.fsData.addCode(codeObj);
+1395: } catch (er) { console.error("Firebase Add Code Error:", er); }
+1398: codesList.push(codeObj);
+1399: localStorage.setItem('spedia_codes', JSON.stringify(codesList));
+1401: if (btn && btn.tagName === 'BUTTON') btn.innerText = "توليد كود عشوائي";
+1403: alert('تم توليد الكود بنجاح: ' + c);
+1436: let subCodeEl = document.getElementById('ct-subcode');
+1447: subCode: (statusEl && statusEl.value === 'paid' && subCodeEl) ? subCodeEl.value : ''
+1561: studentCode: document.getElementById('ex-student-code') ? document.getElementById('ex-student-code').value.trim() : ''
+1578: window.openGrading = async function (code, title) {
+1580: currentSub = subs.find(s => s.code === code && s.examTitle === title);
+1581: document.getElementById('grad-student-name').innerText = currentSub.name || code;
+1631: let newResult = { code: currentSub.code, examTitle: currentSub.examTitle, grade: `${ok}/${total}`, date: new Date().toLocaleDateString('ar-EG') };
+1642: let sIndex = subs.findIndex(s => s.code === currentSub.code && s.examTitle === currentSub.examTitle);
+1669: showSection('tab-codes');
+1680: let code = document.getElementById('chat-code').value.trim();
+1684: let chatMsg = { id: Date.now(), studentCode: code, teacher: teacher, message: msg, date: new Date().toLocaleDateString('ar-EG'), sender: 'admin' };
+1694: notifs.push({ code: code, text: `رسالة جديدة من ${teacher}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
+1704: let code = document.getElementById('mr-code').value.trim();
+1709: let report = { id: Date.now(), studentCode: code, title: title, evaluation: evalText, details: details, date: new Date().toLocaleDateString('ar-EG') };
+1719: notifs.push({ code: code, text: `تقرير شهري جديد: ${title}`, date: new Date().toLocaleDateString('ar-EG'), read: false });
