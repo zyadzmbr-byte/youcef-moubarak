@@ -122,6 +122,11 @@ window.fsData = {
         const userDoc = doc(db, "users", user.code);
         return await setDoc(userDoc, user);
     },
+    getUser: async (code) => {
+        const snap = await getDocs(query(collection(db, "users"), where("code", "==", code)));
+        if (!snap.empty) return snap.docs[0].data();
+        return null;
+    },
     getAllUsers: async () => {
         const snap = await getDocs(collection(db, "users"));
         return snap.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));

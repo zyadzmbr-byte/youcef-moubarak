@@ -429,10 +429,26 @@ window.renderCurrentPage = async function () {
         if (!user) { window.location.href = 'login.html'; return; }
 
         const elName = document.getElementById('dash-name');
-        if (elName) elName.innerText = user.name;
-
         const elGrade = document.getElementById('dash-grade');
+        
+        // Populate initially from localStorage for speed
+        if (elName) elName.innerText = user.name;
         if (elGrade) elGrade.innerText = `طالب مسجل كود: ${user.code}`;
+
+        // Fetch real data from server if available
+        if (window.fsData && window.fsData.getUser) {
+            window.fsData.getUser(user.code).then(realUser => {
+                if (realUser) {
+                    // Sync local storage
+                    user = { ...user, ...realUser };
+                    localStorage.setItem('spedia_currentUser', JSON.stringify(user));
+                    // Update UI with real data
+                    if (elName) elName.innerText = user.name;
+                    // If you want to show the real grade instead of just the code, use user.grade if it exists
+                    if (elGrade) elGrade.innerText = user.grade || `طالب مسجل كود: ${user.code}`;
+                }
+            }).catch(e => console.error("Error fetching real user data:", e));
+        }
 
         await window.loadStudentData(user);
     }
